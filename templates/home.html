@@ -1,0 +1,34 @@
+<html lang="en">
+<head>
+    <title>Token Generator</title>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+</head>
+<body>
+<nav class="red lighten-1">
+    <div class="nav-wrapper">
+        <a href="#" class="brand-logo center">Google Access Token Generator</a>
+    </div>
+</nav>
+<div class="section">
+    <div class="center">
+        <h5>
+            Generate your token by clicking the button below!
+        </h5>
+    </div>
+    <div class="row center">
+        <a href="{{url_for('get_token')}}">
+            <button id="generateToken" class="btn green">Generate Token</button>
+        </a>
+        <a href="{{url_for('clear_credentials')}}">
+            <button id="clearCreds" class="btn blue">Clear Session</button>
+        </a>
+        <div class="center">
+            <p>Clearing session will force re-authorization on next token generation.</p>
+        </div>
+    </div>
+</div>
+</body>
+</html>
