@@ -14,6 +14,7 @@
 
 import os
 from flask import Flask, render_template, session, redirect, request, url_for
+from datetime import datetime
 
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
@@ -50,6 +51,9 @@ def get_token():
   credentials = google.oauth2.credentials.Credentials(
       **session['credentials'])
 
+  # drop timezone information, expiry is in UTC format
+  credentials.expiry = credentials.expiry.replace(tzinfo=None)
+
   # Refresh credentials if not valid
   if not credentials.valid:
     credentials.refresh(Request())
@@ -59,7 +63,13 @@ def get_token():
   #              credentials in a persistent database instead.
   session['credentials'] = credentials_to_dict(credentials)
 
-  return (home_page() + f'<div class="center"><strong>Your access token:</strong> {credentials.token}</div>')
+  # get timedelta until token expires
+  token_duration = credentials.expiry - datetime.utcnow()
+  hours, minutes, seconds = token_duration.seconds//3600, (token_duration.seconds//60)%60, token_duration.seconds%60
+  
+  token_div = f'<div class="center"><strong>Your access token:</strong> {credentials.token}</div>'
+  expiration_div = f'<div class="center"><strong>Token expires in:</strong> {hours} hours, {minutes} minutes and {seconds} seconds.</div>'
+  return (home_page() + token_div + expiration_div)
 
 
 @app.route('/authorize')
@@ -123,7 +133,8 @@ def credentials_to_dict(credentials):
           'token_uri': credentials.token_uri,
           'client_id': credentials.client_id,
           'client_secret': credentials.client_secret,
-          'scopes': credentials.scopes}
+          'scopes': credentials.scopes,
+          'expiry': credentials.expiry}
 
 def home_page():
   return (render_template("home.html"))
